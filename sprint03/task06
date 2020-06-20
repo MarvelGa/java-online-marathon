@@ -1,0 +1,182 @@
+import java.util.*;
+
+enum SortOrder {
+    ASC, DESC
+}
+
+public class AddressBook implements Iterable {
+    private NameAddressPair[] addressBook;
+    private int counter = 0;
+    HashMap<NameAddressPair.Person, String> addressPairs = new HashMap<>();
+    int capacity;
+
+    public AddressBook(NameAddressPair[] addressBook) {
+        this.addressBook = addressBook;
+    }
+
+    public AddressBook(int capacity) {
+        addressBook = new NameAddressPair[capacity];
+    }
+
+    public void expandAddressBook() {
+        NameAddressPair[] newAddressBook = new NameAddressPair[addressBook.length * 2];
+        for (int i = 0; i < addressBook.length; i++) {
+            newAddressBook[i] = addressBook[i];
+        }
+        addressBook = newAddressBook;
+    }
+
+    public boolean isPersonExist(NameAddressPair.Person person) {
+        Boolean result = false;
+        for (int i = 0; i < counter; i++) {
+            NameAddressPair np = addressBook[i];
+            if (np.person.equals(person)) {
+                result = true;
+                break;
+            }
+        }
+        return result;
+    }
+
+    public boolean create(String firstName, String lastName, String address) {
+        boolean result = false;
+        NameAddressPair.Person person = new NameAddressPair.Person(firstName, lastName);
+        NameAddressPair nameAddressPair = new NameAddressPair(person, address);
+
+        if (counter == addressBook.length) {
+            expandAddressBook();
+        }
+        if (!isPersonExist(person)) {
+            addressBook[counter] = nameAddressPair;
+            counter++;
+            result = true;
+        }
+        return result;
+    }
+
+    public String read(String firstName, String lastName) {
+        NameAddressPair.Person person = new NameAddressPair.Person(firstName, lastName);
+        NameAddressPair nameAddressPair = null;
+        if (nameAddressPair != null) {
+            for (int i = 0; i < counter; i++) {
+                if (addressBook[i].person.equals(person)) {
+                    nameAddressPair =
+                            new NameAddressPair(person, addressBook[i].address);
+                }
+            }
+            return nameAddressPair.toString();
+        }
+        return null;
+    }
+
+
+    public boolean update(String firstName, String lastName, String address) {
+        boolean resutl = false;
+        NameAddressPair.Person person = new NameAddressPair.Person(firstName, lastName);
+        NameAddressPair nameAddressPair = new NameAddressPair(person, address);
+
+        for (int i = 0; i < counter; i++) {
+            if (addressBook[i].person.equals(nameAddressPair.person)) {
+                addressBook[i] = nameAddressPair;
+                resutl = true;
+                break;
+            }
+        }
+        return resutl;
+    }
+
+    public boolean delete(String firstName, String lastName) {
+        boolean result = false;
+        NameAddressPair.Person person = new NameAddressPair.Person(firstName, lastName);
+
+        if (isPersonExist(person)) {
+            for (int i = 0; i < counter; i++) {
+                if (addressBook[i].person.equals(person)) {
+                    for (int k = i; k < addressBook.length - 1; k++) {
+                        addressBook[k] = addressBook[k + 1];
+                    }
+                    addressBook[addressBook.length - 1] = null;
+                    counter--;
+                    result = true;
+                    break;
+                }
+            }
+        }
+        return result;
+    }
+
+    public int size() {
+        return counter;
+    }
+
+    public void sortedBy(SortOrder order) {
+    }
+
+    @Override
+    public Iterator iterator() {
+        return new AddressBookIterator();
+    }
+
+    private class AddressBookIterator implements Iterator {
+        private int counter = 0;
+
+        @Override
+        public boolean hasNext() {
+            return counter < addressBook.length && addressBook[counter] != null;
+        }
+
+        @Override
+        public Object next() {
+            if (hasNext())
+                return addressBook[counter++].toString();
+            else
+                throw new NoSuchElementException();
+        }
+    }
+
+    private static class NameAddressPair {
+        private final Person person;
+        private String address;
+
+        private NameAddressPair(Person person, String address) {
+            this.person = person;
+            this.address = address;
+        }
+
+        @Override
+        public String toString() {
+            return person.toString() +
+                    ", Address: " + address;
+        }
+
+        private static class Person {
+            private String firstName;
+            private String lastName;
+
+            private Person(String firstName, String lastName) {
+                this.firstName = firstName;
+                this.lastName = lastName;
+            }
+
+            @Override
+            public boolean equals(Object o) {
+                if (this == o) return true;
+                if (o == null || getClass() != o.getClass()) return false;
+                Person person = (Person) o;
+                return firstName.equals(person.firstName) &&
+                        lastName.equals(person.lastName);
+            }
+
+            @Override
+            public int hashCode() {
+                return Objects.hash(firstName, lastName);
+            }
+
+            @Override
+            public String toString() {
+                return "FirstName: " + firstName +
+                        ", LastName= " + lastName;
+            }
+        }
+    }
+}
