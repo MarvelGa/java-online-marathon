@@ -1,0 +1,20 @@
+public class ArrayUtil {
+    public static <T> T setAndReturn(T[] v1, T v2, int v3) {
+        v1[v3] = v2;
+        return v1[v3];
+    }
+}
+
+class MyClass {
+    public static void main(String[] args) {
+        ArrayUtil arrayUtil = new ArrayUtil();
+
+        String[] words = new String[3];
+        String wordFromSecondPosition = arrayUtil.<String>setAndReturn(words, "Hello", 1);
+        System.out.println(wordFromSecondPosition);
+
+        Integer[] numbers = new Integer[3];
+        int numbersFromSecondPosition = arrayUtil.<Integer>setAndReturn(numbers, 52, 1);
+        System.out.println(numbersFromSecondPosition);
+    }
+}
