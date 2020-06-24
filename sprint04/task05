@@ -1,0 +1,37 @@
+class Array<T> {
+    private T[] array;
+
+    public Array(T[] array) {
+        this.array = array;
+    }
+
+    public T get(int index) {
+        return array[index];
+    }
+
+    public int length() {
+        return array.length;
+    }
+}
+
+public class ArrayUtil {
+    public static double averageValue(Array<? extends Number> obj) {
+        double sum = 0.0;
+        for (int i = 0; i < obj.length(); i++) {
+            sum += obj.get(i).doubleValue();
+        }
+        return sum / obj.length();
+    }
+}
+
+class MyClass {
+    public static void main(String[] args) {
+        Array<Integer> set1 = new Array<>(new Integer[]{1, 2, 4, 5,});
+        double averageValue1 = ArrayUtil.averageValue(set1);
+        System.out.println(averageValue1);
+
+        Array<Double> set2 = new Array<>(new Double[]{1.0, 3.0, 5.0});
+        double averageValue2 = ArrayUtil.averageValue(set2);
+        System.out.println(averageValue2);
+    }
+}
