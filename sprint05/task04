@@ -1,81 +1,109 @@
-public class Plant {
-    private Type type;
-    private Color color;
-    private String name;
+public class Person {
+    private String firstName;
+    private String lastName;
+    private String idCode;
+    String pattern = "^[A-Z][a-z\\s\\-]+";
 
-    public Plant() {
+
+    public String getFirstName() {
+        return firstName;
     }
 
-    public Plant(String type, String color, String name) throws ColorException, TypeException {
-          try {
-        this.type=Type.valueOf(type.toUpperCase());
+    public void setFirstName(String firstName) throws NameException {
+        if (!firstName.matches(pattern)) {
+            throw new NameException("Incorrect value " + firstName + " for firstName" + " (should start from upper case and contains only alphabetic characters and symbols -, _)");
         }
-        catch(IllegalArgumentException e)
-        {
-            throw new TypeException("Invalid value "+type+" for field type");
+        this.firstName = firstName;
+    }
+
+    public String getLastName() {
+        return lastName;
+    }
+
+    public void setLastName(String lastName) throws NameException {
+        if (!lastName.matches(pattern)) {
+            throw new NameException("Incorrect value " + lastName + " for lastName" + " (should start from upper case and contains only alphabetic characters and symbols -, _)");
         }
-        try{
-            this.color=Color.valueOf(color.toUpperCase());
-            }
-        catch(IllegalArgumentException e)
-        {
-            throw new ColorException("Invalid value "+color+ " for field color");
+        this.lastName = lastName;
+    }
+
+    public String getIdCode() {
+        return idCode;
+    }
+
+    public void setIdCode(String idCode) throws CodeException {
+        String pattern = "\\d{10}";
+        if (!idCode.matches(pattern)) {
+            throw new CodeException("Incorrect value " + idCode + " for code"+" (should contains exactly 10 digits)");
         }
-        this.name = name;
-    
-    }
-
-    public Type getType() {
-        return type;
-    }
-
-    public void setType(Type type) {
-        this.type = type;
-    }
-
-    public Color getColor() {
-        return color;
-    }
-
-      public void setColor(Color color) {
-        this.color = Color.valueOf(color.toString());
-    }
-
-
-    public String getName() {
-        return name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
+        this.idCode = idCode;
     }
 
     @Override
     public String toString() {
-        return "{type: " + getType() + ", color: " + getColor() + ", name: " + getName() + "}";
+        return firstName + " " + lastName + ':' + " " + idCode;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Person person = (Person) o;
+        return Objects.equals(firstName, person.firstName) &&
+                Objects.equals(lastName, person.lastName) &&
+                Objects.equals(idCode, person.idCode);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(firstName, lastName, idCode);
+    }
+
+    static Person buildPerson(String firstName, String lastName, String idCode) throws CodeException, NameException {
+        Person person = new Person();
+        List<String> list = new ArrayList<>();
+
+        try {
+            person.setFirstName(firstName);
+        }catch (NameException ex){
+            list.add(ex.getMessage());
+        }
+
+        try {
+            person.setLastName(lastName);
+        }catch (NameException ex){
+            list.add(ex.getMessage());
+        }
+
+        try {
+            person.setIdCode(idCode);
+        }catch (CodeException ex){
+            list.add(ex.getMessage());
+        }
+
+        if (!list.isEmpty()){
+            StringBuilder mes= new StringBuilder();
+            for (int i=0; i<list.size(); i++){
+                mes.append(list.get(i));
+                if (i!=list.size()-1){
+                    mes.append("; ");
+                }
+            }
+            throw new IllegalArgumentException(String.valueOf(mes));
+        }
+
+        return person;
     }
 }
 
-enum Color{
-    WHITE, RED, BLUE;
-}
-enum Type{
-    RARE, ORDINARY;
-}
-
-class ColorException extends RuntimeException{
-    public ColorException() {
-    }
-
-    public ColorException(String message) {
+class NameException extends RuntimeException {
+    public NameException(String message) {
         super(message);
     }
 }
-class TypeException extends RuntimeException{
-    public TypeException() {
-    }
 
-    public TypeException(String message) {
+class CodeException extends RuntimeException {
+    public CodeException(String message) {
         super(message);
     }
 }
