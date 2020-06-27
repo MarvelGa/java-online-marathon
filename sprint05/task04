@@ -1,0 +1,81 @@
+public class Plant {
+    private Type type;
+    private Color color;
+    private String name;
+
+    public Plant() {
+    }
+
+    public Plant(String type, String color, String name) throws ColorException, TypeException {
+          try {
+        this.type=Type.valueOf(type.toUpperCase());
+        }
+        catch(IllegalArgumentException e)
+        {
+            throw new TypeException("Invalid value "+type+" for field type");
+        }
+        try{
+            this.color=Color.valueOf(color.toUpperCase());
+            }
+        catch(IllegalArgumentException e)
+        {
+            throw new ColorException("Invalid value "+color+ " for field color");
+        }
+        this.name = name;
+    
+    }
+
+    public Type getType() {
+        return type;
+    }
+
+    public void setType(Type type) {
+        this.type = type;
+    }
+
+    public Color getColor() {
+        return color;
+    }
+
+      public void setColor(Color color) {
+        this.color = Color.valueOf(color.toString());
+    }
+
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    @Override
+    public String toString() {
+        return "{type: " + getType() + ", color: " + getColor() + ", name: " + getName() + "}";
+    }
+}
+
+enum Color{
+    WHITE, RED, BLUE;
+}
+enum Type{
+    RARE, ORDINARY;
+}
+
+class ColorException extends RuntimeException{
+    public ColorException() {
+    }
+
+    public ColorException(String message) {
+        super(message);
+    }
+}
+class TypeException extends RuntimeException{
+    public TypeException() {
+    }
+
+    public TypeException(String message) {
+        super(message);
+    }
+}
