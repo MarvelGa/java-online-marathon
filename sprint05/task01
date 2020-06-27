@@ -1,0 +1,28 @@
+public class Operation {
+    public static int squareRectangle(int a, int b) {
+        if ( a > 0 && b > 0) {
+         return a * b;  
+        }
+        throw new IllegalArgumentException("both arguments should be more than zero"); 
+    
+    }
+
+    public static int trySquareRectangle(int a, int b) {
+        int result = 0;
+        try {
+            result = squareRectangle(a, b);
+        } catch (IllegalArgumentException e) {
+            result = -1;
+        }
+        return result;
+    }
+}
+
+class MyClass{
+    public static void main(String[] args) {
+        Operation.squareRectangle(0,5);
+        Operation.squareRectangle(0,5);
+        System.out.println(Operation.squareRectangle(0,5));
+        System.out.println(Operation.trySquareRectangle(0,-1));
+    }
+}
