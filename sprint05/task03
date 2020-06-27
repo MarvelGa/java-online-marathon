@@ -1,0 +1,9 @@
+ static Plant tryCreatePlant(String type, String color, String name) throws TypeException, ColorException  {
+        try{
+            return new Plant(type, color, name);
+        }catch(TypeException tEx){
+            return new Plant ("Ordinary", color, name);
+        }catch(ColorException cEx){
+            return tryCreatePlant(type, "Red", name);
+        }
+    }
