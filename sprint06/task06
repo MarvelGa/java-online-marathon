@@ -1,0 +1,34 @@
+import java.util.function.Predicate;
+import java.util.function.BiFunction;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Collections;
+
+class MyUtils{
+  public static int findMaxByCondition(List<Integer> numbers, Predicate<Integer> pr) {
+        List<Integer> findMaxValue = new ArrayList<>();
+       for (Integer  elem: numbers){
+           if (pr.test(elem)){
+            findMaxValue.add(elem);
+           }
+
+       }
+      return Collections.max(findMaxValue);
+    }
+}
+
+class User {
+    public final List<Integer> values = new ArrayList<Integer>();   
+    
+    int getFilterdValue(BiFunction< List<Integer> , Predicate<Integer>, Integer> biFunction, Predicate<Integer> pr  ){
+        
+         return biFunction.apply(values, pr);
+        
+    }
+    
+    int getMaxValueByCondition(Predicate<Integer> predicate) {
+        
+        return   MyUtils.findMaxByCondition(values,predicate);
+        
+    }
+}
