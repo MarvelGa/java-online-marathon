@@ -1,0 +1,13 @@
+class MyUtils{
+   
+   static Predicate<Integer> getPredicateFromSet(Set<Predicate<Integer>> predicates) {
+        Predicate<Integer> predicate = null;
+        for (Predicate<Integer> elem : predicates) {
+            if (predicate != null)
+                predicate = predicate.and(elem);
+            else predicate = elem;
+        }
+        return predicate;
+    }
+   
+}
