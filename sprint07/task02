@@ -1,0 +1,40 @@
+import java.lang.annotation.*;
+import java.time.LocalDateTime;
+
+@Retention(RetentionPolicy.RUNTIME)
+@Target({ElementType.TYPE})
+@interface Review {
+    String reviewer();
+
+    String date() default "today";
+}
+
+public class Util {
+
+    public static void review(String className) throws ClassNotFoundException {
+        try {
+            Class aClass = Class.forName(className);
+            Annotation[] annotations = aClass.getAnnotations();
+            if (annotations.length == 0) {
+                System.out.println("Class " + className + " isn't marked as Reviewed");
+            }
+            for (Annotation annElem : annotations) {
+                if (annElem instanceof Review) {
+                    if (((Review) annElem).date().equals("today")) {
+                        System.out.println("Class " + className + " was reviewed " + LocalDate.now() + " by " + ((Review) annElem).reviewer() + '.');
+                    } else {
+                        System.out.println("Class " + className + " was reviewed " + ((Review) annElem).date() + " by " + ((Review) annElem).reviewer() + '.');
+                    }
+                } else {
+                    System.out.println("Class " + className + " isn't marked as Reviewed");
+                }
+
+            }
+
+        } catch (ClassNotFoundException e) {
+            System.out.println("Class " + className + " was not found");
+        }
+
+    }
+
+}
