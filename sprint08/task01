@@ -1,0 +1,36 @@
+import java.util.function.BinaryOperator;
+
+public class ParallelCalculator implements Runnable {
+    int result;
+    BinaryOperator<Integer> binaryOperator;
+    int operand1;
+    int operand2;
+
+    public ParallelCalculator(BinaryOperator<Integer> binaryOperator, int operand1, int operand2) {
+        this.binaryOperator = binaryOperator;
+        this.operand1 = operand1;
+        this.operand2 = operand2;
+        this.result = binaryOperator.apply(operand1, operand2);
+    }
+
+
+    @Override
+    public void run() {
+       // System.out.println(result + " " + Thread.currentThread().getName());
+    }
+}
+
+class MyClass {
+    public static void main(String[] args) {
+        ParallelCalculator p = new ParallelCalculator((t, s) -> t + s, 2, 3);
+        ParallelCalculator p2 = new ParallelCalculator((t, s) -> t + s, 4, 3);
+        ParallelCalculator p3 = new ParallelCalculator((t, s) -> t - s, 8, 5);
+        Thread one = new Thread(p);
+        Thread two = new Thread(p2);
+        Thread three = new Thread(p3);
+        one.start();
+        two.start();
+        three.start();
+
+    }
+}
