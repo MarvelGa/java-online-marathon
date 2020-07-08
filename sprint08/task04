@@ -1,0 +1,90 @@
+public class MyThreads {
+    public final static Object den = new Object();
+    public final static Object ada = new Object();
+
+    public static int n;
+    public static int m;
+    public boolean statement = false;
+
+    public static Thread t1 = new Thread() {
+        public void run() {
+
+            synchronized (den) {
+                for (int i = 0; i < 5; i++, n++)
+                    System.out.println("Thread1 n = " + n);
+
+            }
+
+            synchronized (ada) {
+                ada.notify();
+                if (!t2.isAlive()) {
+                    for (int i = 5; i < 10; i++, m++)
+                        System.out.println("Thread1 m = " + m);
+                    System.out.println("Thread1 success!");
+                } else {
+                    try {
+                        ada.wait();
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    }
+
+                    for (int i = 5; i < 10; i++, m++)
+                        System.out.println("Thread1 m = " + m);
+                    System.out.println("Thread1 success!");
+                }
+
+
+            }
+
+
+        }
+
+    };
+
+    public static Thread t2 = new Thread() {
+
+        public void run() {
+
+
+            synchronized (ada) {
+
+                if (!t1.isAlive()) {
+
+                    for (int i = 0; i < 5; i++, m++)
+                        System.out.println("Thread2 m = " + m);
+
+                } else {
+
+                    try {
+                        ada.wait();
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    }
+
+                    for (int i = 0; i < 5; i++, m++)
+                        System.out.println("Thread2 m = " + m);
+
+                }
+
+
+                synchronized (den) {
+                    for (int i = 5; i < 10; i++, n++)
+                        System.out.println("Thread2 n = " + n);
+                    System.out.println("Thread2 success!");
+                    den.notify();
+                }
+                ada.notify();
+
+            }
+
+        }
+
+    };
+}
+
+class MyClass {
+    public static void main(String[] args) {
+        MyThreads.t1.start();
+        MyThreads.t2.start();
+    }
+}
