@@ -1,0 +1,15 @@
+public class MyUtils {
+    public static boolean isLeapYear(int year) {
+
+        LocalDate localDate = LocalDate.of(year, 1, 1);
+        if (localDate.isLeapYear())
+            return true;
+        return false;
+    }
+}
+
+class Main {
+    public static void main(String[] args) {
+        System.out.println(MyUtils.isLeapYear(1900));
+    }
+}
