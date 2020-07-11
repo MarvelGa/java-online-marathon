@@ -1,0 +1,17 @@
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
+
+public class DateTest {
+    public static String getDateAfterToday(int years, int months, int days) {
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+        LocalDate localDate = LocalDate.now();
+        String result = formatter.format(localDate.plusYears(years).plusMonths(months).plusDays(days));
+        return result;
+    }
+}
+
+class MyClass {
+    public static void main(String[] args) {
+        System.out.println(DateTest.getDateAfterToday(2020, 06, 30));
+    }
+}
