@@ -1,0 +1,36 @@
+import java.io.*;
+
+public class MyUtils {
+    public static String readFile(String filename) {
+        FileInputStream inFile;
+        byte[] r;
+        String word = "";
+
+        try {
+            inFile = new FileInputStream(filename);
+            int bytesAv = inFile.available();
+            r = new byte[bytesAv];
+            int count = inFile.read(r, 0, bytesAv);
+            String str = new String(r, "UTF-8");
+
+            for (int i = 0; i < str.length(); i += 7) {
+                String let = str.substring(i, i + 7);
+                word += (char) Integer.parseInt(let, 2);
+            }
+            inFile.close();
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return word;
+    }
+
+}
+
+class MyClass {
+    public static void main(String[] args) {
+        MyUtils.readFile("name1");
+        System.out.println(MyUtils.readFile("name1"));
+    }
+}
