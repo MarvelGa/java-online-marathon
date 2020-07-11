@@ -1,0 +1,16 @@
+import java.util.*;
+
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
+
+
+public class MyUtils {
+   public Stream<Integer> duplicateElements(Stream<Integer> stream) {
+        Set<Integer> set = new LinkedHashSet<>();
+        List<Integer> list = new ArrayList<>(stream.collect(Collectors.toList()));
+        List<Integer> l = new ArrayList<>();
+        list.stream().filter(Objects::nonNull).forEach(l::add);
+        l.stream().filter(e -> Collections.frequency(l, e) > 1).sorted().forEach(e->set.add(e));
+        return set.stream();
+}
+}
