@@ -1,0 +1,34 @@
+import java.util.*;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
+
+import static java.util.stream.Collectors.toList;
+
+public class MyUtils {
+   public Map<String, Stream<String>> phoneNumbers(List<Stream<String>> list) {
+         Stream<String> stream = Stream.empty ( );
+        Map<String, Stream<String>> result = new HashMap<> ( );
+
+        if (list == null) {
+            return null;
+        }
+        for (Stream<String> elem : list) {
+            if (elem != null)
+                stream = Stream.concat ( stream , elem ).filter ( x -> x != null ).map ( x -> x.replaceAll ( "[()]*[ ]*[-]*" , "" ) ).filter ( x -> !x.equals ( "" ) );
+        }
+
+        List<String> numbers = stream.collect ( toList ( ) );
+        if (numbers.stream ( ).anyMatch ( x->x.length ()==10 )) {
+            result=numbers.stream ( ).filter ( x -> x.length ( ) == 10 ).distinct ( )
+                    .collect ( Collectors.groupingBy ( x -> x.substring( 0 , 3 ) , Collectors.mapping ( x -> x.substring ( 3 ) , toList ( ) ) ) )
+                    .entrySet ( ).stream ( ).collect ( Collectors.toMap ( x -> x.getKey ( ) , x -> x.getValue ( ).stream ( ).sorted ( String::compareTo ) ) );
+        }
+        if (numbers.stream ( ).anyMatch ( x -> x.length ( ) < 7 )) {
+            result.put ( "err" , numbers.stream ( ).filter ( x -> x.length ( ) < 7 ).distinct ( ).sorted ( ) );
+        }
+        if (numbers.stream ( ).anyMatch ( x -> x.length ( ) == 7 )) {
+            result.put ( "loc" , numbers.stream ( ).filter ( x -> x.length ( ) == 7 ).distinct ( ).sorted ( ) );
+        }
+        return result;
+    }
+}
