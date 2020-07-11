@@ -1,0 +1,25 @@
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+import java.util.stream.IntStream;
+import java.util.stream.Stream;
+
+public class MyUtils {
+   public Stream<String> nameList(Map<String, Stream<String>> map) {
+       
+       return map.entrySet().stream().map(Map.Entry::getValue).filter(x -> x != null)
+                .flatMap(stringStream -> stringStream.filter(x -> x != null)
+                        .map(str -> doChanging(str))
+                        .filter(str -> !str.isEmpty())).distinct().sorted();
+    }
+
+    public String doChanging(String str) {
+        IntStream resultFirstOne = str.chars().filter(x -> !Character.isSpaceChar(x)).limit(1).map(Character::toUpperCase);
+        IntStream resultOtherOnes = str.chars().filter(x -> !Character.isSpaceChar(x)).skip(1).map(Character::toLowerCase);
+        return IntStream.concat(resultFirstOne, resultOtherOnes)
+                .collect(StringBuilder::new, StringBuilder::appendCodePoint, StringBuilder::append).toString();
+    }
+}
