@@ -1,4 +1,3 @@
-
 import java.util.ArrayList;
 import java.util.List;
 import java.sql.*;
@@ -16,73 +15,64 @@ public class MyUtils {
     }
       
 
-  public void closeConnection() {
+   public void closeConnection() throws SQLException {
         try {
-            if (connection != null) {
-             connection.close();
+            if(connection!=null) {
+                connection.close();
             }
         } catch (SQLException e) {
             e.printStackTrace();
         }
     }
-
-    public Statement createStatement() throws SQLException {
-        Statement statement = connection.createStatement();
-         this.statement=statement;
-        return statement;
+    public Statement createStatement() throws SQLException{
+        return statement = connection.createStatement();
     }
-
     public void closeStatement() throws SQLException {
+        Statement statement= connection.createStatement();
         statement.close();
     }
-
     public void createSchema(String schemaName) throws SQLException {
-        this.schemaName = schemaName;
-        String sql = "CREATE SCHEMA IF NOT EXISTS " + schemaName;
+        this.schemaName=schemaName;
+        String sql ="CREATE SCHEMA IF NOT EXISTS " + schemaName;
         statement.execute(sql);
-    }
 
+    }
     public void dropSchema() throws SQLException {
-        String sql = "DROP SCHEMA " + this.schemaName;
+        String sql ="DROP SCHEMA " + this.schemaName;
         statement.execute(sql);
     }
-
     public void useSchema() throws SQLException {
-        String sql = "USE " + this.schemaName;
+        String sql ="USE " + this.schemaName;
         statement.execute(sql);
     }
-
     public void createTableRoles() throws SQLException {
-        String sql = "CREATE TABLE `roles` ( `id` INT PRIMARY KEY AUTO_INCREMENT, roleName varchar(255) not null)";
+        String sql ="create table roles ( id INT PRIMARY KEY AUTO_INCREMENT, roleName varchar(255) not null)";
          statement.execute(sql);
     }
-
     public void createTableDirections() throws SQLException {
-        String sql = "CREATE TABLE `directions`\n" +
+        String sql ="create table directions\n" +
                 "(\n" +
-                "    `id` INT PRIMARY KEY AUTO_INCREMENT,\n" +
+                "    id INT PRIMARY KEY AUTO_INCREMENT,\n" +
                 "    directionName varchar(255) not null\n" +
                 ")";
-        statement.execute(sql);
+         statement.execute(sql);
     }
-
     public void createTableProjects() throws SQLException {
-        String sql = "CREATE TABLE `projects`\n" +
+        String sql ="create table projects\n" +
                 "(\n" +
-                "    `id` INT PRIMARY KEY AUTO_INCREMENT,\n" +
+                "    id INT PRIMARY KEY AUTO_INCREMENT,\n" +
                 "    projectName varchar(255) not null,\n" +
                 "    directionId int not null,\n" +
                 "    constraint FK_direction_id\n" +
                 "        foreign key (directionId)\n" +
                 "            references directions(id) ON DELETE CASCADE\n" +
                 ")";
-        statement.execute(sql);
+         statement.execute(sql);
     }
-
     public void createTableEmployee() throws SQLException {
-        String sql = "CREATE TABLE `employee`\n" +
+        String sql ="create table employee\n" +
                 "(\n" +
-                "    `id` INT PRIMARY KEY AUTO_INCREMENT,\n" +
+                "    id INT PRIMARY KEY AUTO_INCREMENT,\n" +
                 "    firstName varchar(255) not null,\n" +
                 "    roleId int not null,\n" +
                 "    projectId int not null,\n" +
@@ -93,80 +83,62 @@ public class MyUtils {
                 "        foreign key (projectId)\n" +
                 "            references projects(id) ON DELETE CASCADE\n" +
                 ")";
-        statement.execute(sql);
+         statement.execute(sql);
     }
-
     public void dropTable(String tableName) throws SQLException {
-        String sql = "DROP TABLE IF EXISTS " + tableName;
-        statement.execute(sql);
-
+        String sql ="DROP TABLE IF EXISTS " + tableName;
+         statement.execute(sql);
     }
 
     public void insertTableRoles(String roleName) throws SQLException {
-         String sql = "INSERT INTO `roles` (`roleName`) VALUES (" + roleName + ")";
-        statement.execute(sql);
-
+        String sql = "INSERT INTO Roles (roleName) VALUES (?);";
+        PreparedStatement preparedStatement = connection.prepareStatement(sql);
+        preparedStatement.setString(1, roleName);
+        preparedStatement.executeUpdate();
     }
-
     public void insertTableDirections(String directionName) throws SQLException {
-
-       String sql = "INSERT INTO `Directions` (`directionName`) VALUES (" + directionName + ")";
-        statement.execute(sql);
-
+        String sql = "INSERT INTO Directions (directionName) VALUES (?);";
+        PreparedStatement preparedStatement = connection.prepareStatement(sql);
+        preparedStatement.setString(1, directionName);
+        preparedStatement.executeUpdate();
     }
-
     public void insertTableProjects(String projectName, String directionName) throws SQLException {
-        String sql = "INSERT INTO `projects` (`projectName`, `directionId`) VALUES (" + projectName + ", " + directionName +")";
-        statement.executeQuery(sql);
+        String sql = "INSERT INTO Projects (projectName, directionId) VALUES ( ?, ?)";
+        PreparedStatement preparedStatement = connection.prepareStatement(sql);
+        preparedStatement.setString(1, projectName);
+        preparedStatement.setInt(2, getDirectionId(directionName));
+        preparedStatement.executeUpdate();
     }
-
     public void insertTableEmployee(String firstName, String roleName, String projectName) throws SQLException {
-        String sql = "INSERT INTO `employee` (`firstName`, `roleId`, `projectId`) VALUES (" + firstName + ", " + roleName + " ," + projectName+ ")";
-        statement.executeQuery(sql);
+        String sql = "INSERT INTO Employee (firstName, roleId, projectId) VALUES ( ?, ?, ?)";
+        PreparedStatement preparedStatement = connection.prepareStatement(sql);
+        preparedStatement.setString(1, firstName);
+        preparedStatement.setInt(2, getRoleId(roleName));
+        preparedStatement.setInt(3, getProjectId(projectName));
+        preparedStatement.executeUpdate();
     }
-
     public int getRoleId(String roleName) throws SQLException {
-        int roleId = 0;
-        String sql = "SELECT `id` FROM `Roles` r WHERE r.roleName=" + '"' + roleName + '"';
-        ResultSet resultSet = statement.executeQuery(sql);
-        while (resultSet.next()) {
-            roleId = resultSet.getInt("id");
-        }
-        return roleId;
+        ResultSet rs = statement.executeQuery("SELECT id FROM Roles WHERE roleName = " +  statement.enquoteLiteral(roleName));
+        rs.next();
+        return rs.getInt("id");
     }
-
     public int getDirectionId(String directionName) throws SQLException {
-        int directionId = 0;
-        String sql = "SELECT `id` FROM `directions` d WHERE d.directionName=" + '"' + directionName + '"' ;
-        ResultSet resultSet = statement.executeQuery(sql);
-        while (resultSet.next()) {
-            directionId = resultSet.getInt("id");
-        }
-        return directionId;
+        ResultSet rs = statement.executeQuery("SELECT id FROM Directions WHERE directionName = " +  statement.enquoteLiteral(directionName));
+        rs.next();
+        return rs.getInt("id");
     }
-
     public int getProjectId(String projectName) throws SQLException {
-        int projectId = 0;
-        String sql = "SELECT `id` FROM `projects` d WHERE d.projectName=" + '"' + projectName + '"';
-        ResultSet resultSet = statement.executeQuery(sql);
-        while (resultSet.next()) {
-            projectId = resultSet.getInt("id");
-        }
-        return projectId;
+        ResultSet rs = statement.executeQuery("SELECT id FROM Projects WHERE projectName = " +  statement.enquoteLiteral(projectName));
+        rs.next();
+        return rs.getInt("id");
     }
-
     public int getEmployeeId(String firstName) throws SQLException {
-        int employeeId = 0;
-        String sql = "SELECT `id` FROM `employee` d WHERE d.firstName=" + '"' + firstName + '"';
-        ResultSet resultSet = statement.executeQuery(sql);
-        while (resultSet.next()) {
-            employeeId = resultSet.getInt("id");
-        }
-        return employeeId;
+        ResultSet rs = statement.executeQuery("SELECT id FROM Employee WHERE firstName = " + statement.enquoteLiteral(firstName));
+        rs.next();
+        return rs.getInt("id");
     }
-
     public List<String> getAllRoles() throws SQLException {
-        String sql = "SELECT * FROM `roles`";
+        String sql = "SELECT * FROM `Roles`";
         ResultSet resultSet = statement.executeQuery(sql);
         List<String> list = new ArrayList<>();
         while (resultSet.next()) {
@@ -177,7 +149,7 @@ public class MyUtils {
     }
 
     public List<String> getAllDirestion() throws SQLException {
-        String sql = "SELECT * FROM `directions`";
+        String sql = "SELECT * FROM `Directions`";
         ResultSet resultSet = statement.executeQuery(sql);
         List<String> list = new ArrayList<>();
         while (resultSet.next()) {
@@ -188,7 +160,7 @@ public class MyUtils {
     }
 
     public List<String> getAllProjects() throws SQLException {
-        String sql = "SELECT * FROM `projects`";
+        String sql = "SELECT * FROM `Projects`";
         ResultSet resultSet = statement.executeQuery(sql);
         List<String> list = new ArrayList<>();
         while (resultSet.next()) {
@@ -199,7 +171,7 @@ public class MyUtils {
     }
 
     public List<String> getAllEmployee() throws SQLException {
-        String sql = "SELECT * FROM `employee`";
+        String sql = "SELECT * FROM `Employee`";
         ResultSet resultSet = statement.executeQuery(sql);
         List<String> list = new ArrayList<>();
         while (resultSet.next()) {
@@ -210,7 +182,7 @@ public class MyUtils {
     }
 
     public List<String> getAllDevelopers() throws SQLException {
-        String sql = "SELECT `firstName` FROM `employee` e JOIN `roles` r ON e.roleId = r.id WHERE r.roleName =\"Developer\" ";
+        String sql = "SELECT `firstName` FROM `Employee` e JOIN `roles` r ON e.roleId = r.id WHERE r.roleName ='Developer'";
         ResultSet resultSet = statement.executeQuery(sql);
         List<String> list = new ArrayList<>();
         while (resultSet.next()) {
@@ -221,7 +193,7 @@ public class MyUtils {
     }
 
     public List<String> getAllJavaProjects() throws SQLException {
-        String sql = "SELECT `projectName` FROM `Projects` p JOIN Directions d ON  p.directionId=d.id WHERE d.directionName=\"Java\" ";
+        String sql = "SELECT `projectName` FROM `Projects` p JOIN Directions d ON  p.directionId=d.id WHERE d.directionName='Java'";
         ResultSet resultSet = statement.executeQuery(sql);
         List<String> list = new ArrayList<>();
         while (resultSet.next()) {
@@ -232,11 +204,11 @@ public class MyUtils {
     }
 
     public List<String> getAllJavaDevelopers() throws SQLException {
-        String sql = "SELECT firstName FROM `employee` e \n" +
+        String sql = "SELECT firstName FROM `Employee` e \n" +
                 "JOIN roles r ON e.roleId = r.id \n" +
                 "JOIN projects p ON e.projectId =p.id\n" +
                 "JOIN directions d ON p.directionId=d.id \n" +
-                "WHERE r.roleName =\"Developer\" AND d.directionName =\"Java\"";
+                "WHERE r.roleName ='Developer' AND d.directionName ='Java'";
         ResultSet resultSet = statement.executeQuery(sql);
         List<String> list = new ArrayList<>();
         while (resultSet.next()) {
