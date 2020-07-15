@@ -1,87 +1,88 @@
-import java.sql.*;
+
 import java.util.ArrayList;
 import java.util.List;
+import java.sql.*;
 
 public class MyUtils {
-    private Connection connection;
-    private Statement statement;
-    private String schemaName;
+	private Connection connection;
+	private Statement statement;
+	private String schemaName;
 
-    public Connection createConnection() throws SQLException, ClassNotFoundException {
-        String url = "jdbc:mysql://localhost:3306/?useUnicode=true&useJDBCCompliantTimezoneShift=true&useLegacyDatetimeCode=false&serverTimezone=UTC";
-        String userName ="root";
-        String password ="root";
-
-        Class.forName("com.mysql.jdbc.Driver");
-        DriverManager.registerDriver(new com.mysql.jdbc.Driver());
-        connection = DriverManager.getConnection(url, userName, password);
-        return connection;
+    public Connection createConnection() throws SQLException {
+    	DriverManager.registerDriver(new org.h2.Driver());
+		connection = DriverManager.getConnection("jdbc:h2:mem:test", "", "");
+		this.connection = connection;
+		return connection;
     }
-    public void closeConnection() throws SQLException {
+      
+
+  public void closeConnection() {
         try {
-            if(connection!=null) {
-                connection.close();
+            if (connection != null) {
+             connection.close();
             }
         } catch (SQLException e) {
             e.printStackTrace();
         }
     }
-    public Statement createStatement() throws SQLException{
-        Statement statement= connection.createStatement();
+
+    public Statement createStatement() throws SQLException {
+        Statement statement = connection.createStatement();
+         this.statement=statement;
         return statement;
     }
+
     public void closeStatement() throws SQLException {
-        Statement statement= connection.createStatement();
         statement.close();
     }
-    public void createSchema(String schemaName) throws SQLException {
-        this.schemaName=schemaName;
-        String sql ="CREATE SCHEMA IF NOT EXISTS " + schemaName;
-        Statement statement= connection.createStatement();
-        statement.execute(sql);
 
+    public void createSchema(String schemaName) throws SQLException {
+        this.schemaName = schemaName;
+        String sql = "CREATE SCHEMA IF NOT EXISTS " + schemaName;
+        statement.execute(sql);
     }
+
     public void dropSchema() throws SQLException {
-        String sql ="DROP SCHEMA " + this.schemaName;
-        Statement statement= connection.createStatement();
+        String sql = "DROP SCHEMA " + this.schemaName;
         statement.execute(sql);
     }
+
     public void useSchema() throws SQLException {
-        String sql ="USE " + this.schemaName;
-        Statement statement= connection.createStatement();
+        String sql = "USE " + this.schemaName;
         statement.execute(sql);
     }
+
     public void createTableRoles() throws SQLException {
-        String sql ="create table Roles ( id INT PRIMARY KEY AUTO_INCREMENT, roleName varchar(255) not null)";
-        PreparedStatement preparedStatement =connection.prepareStatement(sql);
-        preparedStatement.execute();
+        String sql = "CREATE TABLE `roles` ( `id` INT PRIMARY KEY AUTO_INCREMENT, roleName varchar(255) not null)";
+         statement.execute(sql);
     }
+
     public void createTableDirections() throws SQLException {
-        String sql ="create table Directions\n" +
+        String sql = "CREATE TABLE `directions`\n" +
                 "(\n" +
-                "    id INT PRIMARY KEY AUTO_INCREMENT,\n" +
+                "    `id` INT PRIMARY KEY AUTO_INCREMENT,\n" +
                 "    directionName varchar(255) not null\n" +
                 ")";
-        PreparedStatement preparedStatement =connection.prepareStatement(sql);
-        preparedStatement.execute();
+        statement.execute(sql);
     }
+
     public void createTableProjects() throws SQLException {
-        String sql ="create table Projects\n" +
+        String sql = "CREATE TABLE `projects`\n" +
                 "(\n" +
-                "    id INT PRIMARY KEY AUTO_INCREMENT,\n" +
+                "    `id` INT PRIMARY KEY AUTO_INCREMENT,\n" +
                 "    projectName varchar(255) not null,\n" +
                 "    directionId int not null,\n" +
                 "    constraint FK_direction_id\n" +
                 "        foreign key (directionId)\n" +
                 "            references directions(id) ON DELETE CASCADE\n" +
                 ")";
-        PreparedStatement preparedStatement =connection.prepareStatement(sql);
-        preparedStatement.execute();
+        statement.execute(sql);
     }
+
     public void createTableEmployee() throws SQLException {
-        String sql ="create table Employee\n" +
+        String sql = "CREATE TABLE `employee`\n" +
                 "(\n" +
-                "    id INT PRIMARY KEY AUTO_INCREMENT,\n" +
+                "    `id` INT PRIMARY KEY AUTO_INCREMENT,\n" +
                 "    firstName varchar(255) not null,\n" +
                 "    roleId int not null,\n" +
                 "    projectId int not null,\n" +
@@ -92,144 +93,138 @@ public class MyUtils {
                 "        foreign key (projectId)\n" +
                 "            references projects(id) ON DELETE CASCADE\n" +
                 ")";
-        PreparedStatement preparedStatement =connection.prepareStatement(sql);
-        preparedStatement.execute();
-    }
-    public void dropTable(String tableName) throws SQLException {
-        String sql ="DROP TABLE IF EXISTS " + tableName;
-        Statement statement= connection.createStatement();
         statement.execute(sql);
     }
-    public void insertTableRoles(String roleName) throws SQLException {
-            String sql = "INSERT INTO Roles (roleName) VALUES (?)";
-            PreparedStatement preparedStatement = connection.prepareStatement(sql);
-            preparedStatement.setString(1, roleName);
-            preparedStatement.executeUpdate();
+
+    public void dropTable(String tableName) throws SQLException {
+        String sql = "DROP TABLE IF EXISTS " + tableName;
+        statement.execute(sql);
+
     }
+
+    public void insertTableRoles(String roleName) throws SQLException {
+         String sql = "INSERT INTO `roles` (`roleName`) VALUES (" + roleName + ")";
+        statement.execute(sql);
+
+    }
+
     public void insertTableDirections(String directionName) throws SQLException {
 
-            String sql = "INSERT INTO Directions (directionName) VALUES ( ?)";
-            PreparedStatement preparedStatement = connection.prepareStatement(sql);
-            preparedStatement.setString(1, directionName);
-            preparedStatement.executeUpdate();
+       String sql = "INSERT INTO `Directions` (`directionName`) VALUES (" + directionName + ")";
+        statement.execute(sql);
 
     }
+
     public void insertTableProjects(String projectName, String directionName) throws SQLException {
-        String sql = "INSERT INTO Projects (projectName, directionId) VALUES ( ?, ?)";
-        PreparedStatement preparedStatement = connection.prepareStatement(sql);
-        preparedStatement.setString(1, projectName);
-        preparedStatement.setInt(2, Integer.valueOf(directionName));
-        preparedStatement.executeUpdate();
+        String sql = "INSERT INTO `projects` (`projectName`, `directionId`) VALUES (" + projectName + ", " + directionName +")";
+        statement.executeQuery(sql);
     }
+
     public void insertTableEmployee(String firstName, String roleName, String projectName) throws SQLException {
-        String sql = "INSERT INTO Employee (firstName, roleId, projectId) VALUES ( ?, ?, ?)";
-        PreparedStatement preparedStatement = connection.prepareStatement(sql);
-        preparedStatement.setString(1, projectName);
-        preparedStatement.setInt(2, Integer.valueOf(roleName));
-        preparedStatement.setInt(3, Integer.valueOf(projectName));
-        preparedStatement.executeUpdate();
+        String sql = "INSERT INTO `employee` (`firstName`, `roleId`, `projectId`) VALUES (" + firstName + ", " + roleName + " ," + projectName+ ")";
+        statement.executeQuery(sql);
     }
+
     public int getRoleId(String roleName) throws SQLException {
-        int roleId =0;
-      String sql = "SELECT id FROM Roles r WHERE r.roleName=" + '"' + roleName + '"';
-      Statement statement = connection.createStatement();
+        int roleId = 0;
+        String sql = "SELECT `id` FROM `Roles` r WHERE r.roleName=" + '"' + roleName + '"';
         ResultSet resultSet = statement.executeQuery(sql);
-        while (resultSet.next()){
+        while (resultSet.next()) {
             roleId = resultSet.getInt("id");
         }
         return roleId;
     }
+
     public int getDirectionId(String directionName) throws SQLException {
-        int roleId =0;
-        String sql = "SELECT id FROM Directions d WHERE d.directionName=" + '"' + directionName + '"';
-        Statement statement = connection.createStatement();
+        int directionId = 0;
+        String sql = "SELECT `id` FROM `directions` d WHERE d.directionName=" + '"' + directionName + '"' ;
         ResultSet resultSet = statement.executeQuery(sql);
-        while (resultSet.next()){
-            roleId = resultSet.getInt("id");
+        while (resultSet.next()) {
+            directionId = resultSet.getInt("id");
         }
-        return roleId;
+        return directionId;
     }
+
     public int getProjectId(String projectName) throws SQLException {
-        int roleId =0;
-        String sql = "SELECT id FROM Projects d WHERE d.projectName=" + '"' + projectName + '"';
-        Statement statement = connection.createStatement();
+        int roleId = 0;
+        String sql = "SELECT `id` FROM `projects` d WHERE d.projectName=" + '"' + projectName + '"';
         ResultSet resultSet = statement.executeQuery(sql);
-        while (resultSet.next()){
-            roleId = resultSet.getInt("id");
+        while (resultSet.next()) {
+            projectId = resultSet.getInt("id");
         }
-        return roleId;
+        return projectId;
     }
+
     public int getEmployeeId(String firstName) throws SQLException {
-        int roleId =0;
-        String sql = "SELECT id FROM Employee d WHERE d.firstName=" + '"' + firstName + '"';
-        Statement statement = connection.createStatement();
+        int employeeId = 0;
+        String sql = "SELECT `id` FROM `employee` d WHERE d.firstName=" + '"' + firstName + '"';
         ResultSet resultSet = statement.executeQuery(sql);
-        while (resultSet.next()){
-            roleId = resultSet.getInt("id");
+        while (resultSet.next()) {
+            employeeId = resultSet.getInt("id");
         }
-        return roleId;
+        return employeeId;
     }
+
     public List<String> getAllRoles() throws SQLException {
-        String sql = "SELECT * FROM Roles";
-        Statement statement = connection.createStatement();
+        String sql = "SELECT * FROM `roles`";
         ResultSet resultSet = statement.executeQuery(sql);
-        List<String> list =new ArrayList<>();
-        while (resultSet.next()){
+        List<String> list = new ArrayList<>();
+        while (resultSet.next()) {
             String roleName = resultSet.getString("roleName");
             list.add(roleName);
         }
         return list;
     }
+
     public List<String> getAllDirestion() throws SQLException {
-        String sql = "SELECT * FROM Directions";
-        Statement statement = connection.createStatement();
+        String sql = "SELECT * FROM `directions`";
         ResultSet resultSet = statement.executeQuery(sql);
-        List<String> list =new ArrayList<>();
-        while (resultSet.next()){
+        List<String> list = new ArrayList<>();
+        while (resultSet.next()) {
             String directionName = resultSet.getString("directionName");
             list.add(directionName);
         }
         return list;
     }
+
     public List<String> getAllProjects() throws SQLException {
-        String sql = "SELECT * FROM Projects";
-        Statement statement = connection.createStatement();
+        String sql = "SELECT * FROM `projects`";
         ResultSet resultSet = statement.executeQuery(sql);
-        List<String> list =new ArrayList<>();
-        while (resultSet.next()){
+        List<String> list = new ArrayList<>();
+        while (resultSet.next()) {
             String projectName = resultSet.getString("projectName");
-            list.add(projectName );
+            list.add(projectName);
         }
         return list;
     }
+
     public List<String> getAllEmployee() throws SQLException {
-        String sql = "SELECT * FROM Employee";
-        Statement statement = connection.createStatement();
+        String sql = "SELECT * FROM `employee`";
         ResultSet resultSet = statement.executeQuery(sql);
-        List<String> list =new ArrayList<>();
-        while (resultSet.next()){
+        List<String> list = new ArrayList<>();
+        while (resultSet.next()) {
             String firstName = resultSet.getString("firstName");
             list.add(firstName);
         }
         return list;
     }
+
     public List<String> getAllDevelopers() throws SQLException {
-        String sql = "SELECT firstName FROM Employee e JOIN Roles r ON e.roleId = r.id WHERE r.roleName =\"Developer\" ";
-        Statement statement = connection.createStatement();
+        String sql = "SELECT `firstName` FROM `employee` e JOIN `roles` r ON e.roleId = r.id WHERE r.roleName =\"Developer\" ";
         ResultSet resultSet = statement.executeQuery(sql);
-        List<String> list =new ArrayList<>();
-        while (resultSet.next()){
+        List<String> list = new ArrayList<>();
+        while (resultSet.next()) {
             String firstName = resultSet.getString("firstName");
             list.add(firstName);
         }
         return list;
     }
+
     public List<String> getAllJavaProjects() throws SQLException {
-        String sql = "SELECT projectName FROM Projects p JOIN Directions d ON  p.directionId=d.id WHERE d.directionName=\"Java\" ";
-        Statement statement = connection.createStatement();
+        String sql = "SELECT `projectName` FROM `Projects` p JOIN Directions d ON  p.directionId=d.id WHERE d.directionName=\"Java\" ";
         ResultSet resultSet = statement.executeQuery(sql);
-        List<String> list =new ArrayList<>();
-        while (resultSet.next()){
+        List<String> list = new ArrayList<>();
+        while (resultSet.next()) {
             String firstName = resultSet.getString("projectName");
             list.add(firstName);
         }
@@ -237,15 +232,14 @@ public class MyUtils {
     }
 
     public List<String> getAllJavaDevelopers() throws SQLException {
-        String sql = "SELECT firstName FROM Employee e \n" +
-                "JOIN Roles r ON e.roleId = r.id \n" +
-                "JOIN Projects p ON e.projectId =p.id\n" +
-                "JOIN Directions d ON p.directionId=d.id \n" +
-                "WHERE r.roleName =\"Developer\" AND d.directionName =\"Java\" ";
-        Statement statement = connection.createStatement();
+        String sql = "SELECT firstName FROM `employee` e \n" +
+                "JOIN roles r ON e.roleId = r.id \n" +
+                "JOIN projects p ON e.projectId =p.id\n" +
+                "JOIN directions d ON p.directionId=d.id \n" +
+                "WHERE r.roleName =\"Developer\" AND d.directionName =\"Java\"";
         ResultSet resultSet = statement.executeQuery(sql);
-        List<String> list =new ArrayList<>();
-        while (resultSet.next()){
+        List<String> list = new ArrayList<>();
+        while (resultSet.next()) {
             String firstName = resultSet.getString("firstName");
             list.add(firstName);
         }
@@ -253,42 +247,4 @@ public class MyUtils {
 
     }
 
-}
-
-
-class MyClass{
-    public static void main(String[] args) throws SQLException, ClassNotFoundException {
-        MyUtils myUtils = new MyUtils();
-        myUtils.createConnection();
-        myUtils.createStatement();
-        myUtils.createSchema("developers");
-        myUtils.useSchema();
-//        myUtils.createTableRoles();
-//        myUtils.createTableDirections();
-//        myUtils.createTableProjects();
-//        myUtils.createTableEmployee();
-//        myUtils.insertTableRoles("Developer");
-//        myUtils.insertTableRoles("DevOps");
-//        myUtils.insertTableRoles("QC");
-        myUtils.getRoleId("QC");
-        System.out.println(myUtils.getRoleId("QC"));
-        myUtils.getDirectionId("Java");
-        System.out.println(myUtils.getDirectionId("Java"));
-        myUtils.getProjectId("Sun");
-        System.out.println(myUtils.getProjectId("Sun"));
-        myUtils.getEmployeeId("Ira");
-        System.out.println(myUtils.getEmployeeId("Ira"));
-        myUtils.getAllRoles();
-        System.out.println(myUtils.getAllRoles());
-        myUtils.getAllDirestion();
-        System.out.println(myUtils.getAllDirestion());
-        myUtils.getAllProjects();
-        System.out.println(myUtils.getAllProjects());
-        myUtils.getAllEmployee();
-        System.out.println(myUtils.getAllEmployee());
-        myUtils.getAllDevelopers();
-        System.out.println(myUtils.getAllDevelopers());
-        myUtils.getAllJavaDevelopers();
-        System.out.println(myUtils.getAllJavaDevelopers());
-    }
 }
