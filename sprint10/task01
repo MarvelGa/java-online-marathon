@@ -146,7 +146,7 @@ public class MyUtils {
     }
 
     public int getProjectId(String projectName) throws SQLException {
-        int roleId = 0;
+        int projectId = 0;
         String sql = "SELECT `id` FROM `projects` d WHERE d.projectName=" + '"' + projectName + '"';
         ResultSet resultSet = statement.executeQuery(sql);
         while (resultSet.next()) {
